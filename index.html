@@ -1,87 +1,1669 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Dealer Hub</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        html, body {
-            width: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            background-color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        iframe {
-            width: 100%;
-            height: 100dvh;
-            border: none;
-            display: block;
-        }
-        /* Loading Screen */
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100dvh;
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-        #loading.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #0ea5e9; /* โทนสีฟ้า/น้ำเงิน สามารถปรับเปลี่ยนได้ */
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
-        }
-        .loading-text {
-            color: #334155;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jaymart Network - Dealer Hub 🚀</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #d71920; 
+      --primary-hover: #b71218;
+      --primary-light: #fef2f2;
+      --primary-border: #fecaca;
+      --secondary: #1e293b; 
+      --dark: #0f172a;
+      --light: #ffffff;
+      
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --border-subtle: #e2e8f0;
+      
+      --grey-disabled: #94a3b8;
+      --green-success: #10b981;
+      --orange-badge: #d97706;
+      --red-required: #ef4444;
+      
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-red: 0 8px 24px -4px rgba(215, 25, 32, 0.3);
+      
+      --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      font-family: 'Prompt', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+      scroll-behavior: smooth; 
+    }
+
+    body {
+      background-color: #e0e7ff;
+      background-image: 
+        radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(355,100%,93%,1) 0px, transparent 50%),
+        radial-gradient(at 80% 50%, hsla(340,100%,76%,1) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%),
+        radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%),
+        radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh; 
+      color: var(--dark); 
+      padding: 0; 
+      overflow-x: hidden;
+    }
+
+    /* PIN Login Screen */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 2000;
+      transition: opacity 0.25s var(--smooth);
+    }
+    .auth-overlay.hidden {
+      display: none;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+      text-align: center;
+      animation: popIn 0.35s var(--spring) forwards;
+    }
+    .auth-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+    .auth-sub {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .pin-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      text-align: center;
+      border: 2px solid #cbd5e1;
+      border-radius: 16px;
+      outline: none;
+      background: #f8fafc;
+      color: var(--dark);
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+    .pin-input:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(215, 25, 32, 0.15);
+    }
+    .auth-error {
+      color: var(--red-required);
+      font-size: 13px;
+      font-weight: 600;
+      min-height: 20px;
+      margin-bottom: 12px;
+    }
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, #d71920 0%, #b71218 100%);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-red);
+      transition: all 0.2s var(--smooth);
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    .btn-login:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      width: 100%; 
+      padding: 10px 16px 100px 16px; 
+      position: relative;
+      z-index: 10;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .brand-pill-wrapper {
+      align-self: center;
+      margin: 0 auto 10px auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #d71920 0%, #b71218 100%);
+      padding: 4px 14px 4px 6px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(215, 25, 32, 0.25);
+      transition: transform 0.2s var(--smooth);
+    }
+    .brand-pill-wrapper:hover {
+      transform: translateY(-1px);
+    }
+
+    .badge-jaymart {
+      background: #ffffff;
+      color: #d71920;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .badge-network {
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: #475569;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .action-bar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 16px; 
+      gap: 10px; 
+      width: 100%; 
+      overflow: hidden; 
+    }
+    
+    .links-wrapper {
+      display: flex; 
+      gap: 8px; 
+      overflow-x: auto; 
+      flex: 1;
+      padding-bottom: 4px; 
+      -ms-overflow-style: none; 
+      scrollbar-width: none;
+    }
+    .links-wrapper::-webkit-scrollbar { display: none; }
+
+    .btn-sheet {
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #334155; 
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.8); 
+      padding: 10px 15px; 
+      border-radius: 16px;
+      font-size: 13px; 
+      font-weight: 600; 
+      box-shadow: var(--shadow-sm);
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      transition: all 0.2s var(--smooth);
+      white-space: nowrap; 
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .btn-sheet:hover { 
+      background: #ffffff; 
+      color: var(--primary); 
+      border-color: var(--primary-border);
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 16px rgba(215, 25, 32, 0.12); 
+    }
+    .btn-sheet:active { transform: scale(0.96); }
+
+    .search-wrapper { 
+      position: relative; 
+      width: 100%; 
+      margin-bottom: 14px; 
+      display: flex; 
+      align-items: center; 
+    }
+    
+    .search-input {
+      width: 100%; 
+      padding: 16px 48px 16px 20px; 
+      font-size: 15px; 
+      font-weight: 500;
+      border: 2px solid rgba(255, 255, 255, 0.85); 
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-md); 
+      color: var(--dark);
+      transition: all 0.25s var(--smooth);
+    }
+    .search-input:focus {
+      outline: none; 
+      border-color: var(--primary); 
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(215, 25, 32, 0.15), var(--shadow-md); 
+      transform: translateY(-2px);
+    }
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .btn-clear-search {
+      position: absolute; 
+      right: 14px; 
+      top: 50%; 
+      transform: translateY(-50%);
+      width: 26px; 
+      height: 26px; 
+      background: #e2e8f0; 
+      border: none; 
+      border-radius: 50%;
+      color: #64748b; 
+      font-size: 13px; 
+      font-weight: bold; 
+      cursor: pointer;
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      transition: all 0.2s var(--spring); 
+      opacity: 0; 
+      pointer-events: none; 
+      z-index: 10;
+    }
+    .btn-clear-search.show { opacity: 1; pointer-events: auto; }
+    .btn-clear-search:hover { background: #cbd5e1; color: var(--dark); }
+
+    .suggestions {
+      position: absolute; 
+      top: 100%; 
+      left: 0; 
+      right: 0; 
+      margin-top: 8px;
+      background: #ffffff; 
+      border-radius: 20px; 
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+      border: 1px solid var(--border-subtle); 
+      overflow-y: auto; 
+      max-height: 350px;
+      display: none; 
+      z-index: 999;
+    }
+    .suggest-item { 
+      padding: 14px 20px; 
+      cursor: pointer; 
+      border-bottom: 1px solid #f1f5f9; 
+      transition: background 0.2s, padding-left 0.2s var(--smooth); 
+    }
+    .suggest-item:hover { 
+      background: #fef2f2; 
+      padding-left: 26px; 
+    }
+    .suggest-title { 
+      font-weight: 600; 
+      font-size: 15px; 
+      color: var(--dark);
+    }
+    .suggest-sub { 
+      font-size: 12px; 
+      color: #64748b; 
+      margin-top: 4px; 
+    }
+
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-count {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+    }
+    .btn-refresh {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--border-subtle);
+      color: #334155;
+      padding: 9px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-refresh:hover {
+      background: #ffffff;
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+
+    .btn-add-new {
+      background: linear-gradient(135deg, #d71920 0%, #b71218 100%); 
+      color: #ffffff; 
+      border: none; 
+      padding: 12px 22px; 
+      border-radius: 16px;
+      font-size: 14px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      box-shadow: var(--shadow-red);
+      transition: all 0.2s var(--smooth); 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      flex-shrink: 0;
+    }
+    .btn-add-new:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 10px 28px rgba(215, 25, 32, 0.4); 
+    }
+    .btn-add-new:active { transform: scale(0.96); }
+
+    .refresh-indicator { 
+      text-align: center; 
+      font-size: 12px; 
+      color: #64748b; 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+      margin-bottom: 4px; 
+      min-height: 18px;
+    }
+    .refresh-indicator.updating { opacity: 1; }
+
+    .results { display: flex; flex-direction: column; gap: 20px; width: 100%; }
+
+    .load-more-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .btn-load-more {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid var(--border-subtle);
+      color: var(--dark);
+      padding: 12px 24px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s var(--smooth);
+    }
+    .btn-load-more:hover {
+      background: #ffffff;
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.88); 
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 24px; 
+      padding: 24px; 
+      box-shadow: var(--shadow-md); 
+      width: 100%; 
+      max-width: 100%; 
+      overflow: hidden;
+      animation: popIn 0.4s var(--spring) forwards;
+      transition: all 0.25s var(--smooth);
+    }
+    @media (max-width: 480px) { 
+      .card { padding: 18px 16px; border-radius: 20px; } 
+    }
+
+    .card:hover { 
+      transform: translateY(-3px); 
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12); 
+      border-color: #cbd5e1;
+    }
+    .card-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 20px; 
+      padding-bottom: 14px; 
+      border-bottom: 1px solid #f1f5f9; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+    }
+    .shop-name { 
+      font-size: 17px; 
+      font-weight: 700; 
+      word-break: break-word; 
+      overflow-wrap: break-word; 
+      color: var(--dark);
+    }
+    
+    .badge { 
+      background: #fef3c7; 
+      color: var(--orange-badge); 
+      padding: 4px 12px; 
+      border-radius: 999px; 
+      font-size: 12px; 
+      font-weight: 600; 
+      white-space: nowrap; 
+    }
+    .badge-jmt { 
+      background: #fee2e2; 
+      color: #b91c1c; 
+      border: 1px solid #fca5a5; 
+    }
+
+    .btn-line {
+      background: #06C755; 
+      color: #ffffff; 
+      text-decoration: none;
+      padding: 5px 14px; 
+      border-radius: 999px; 
+      font-size: 12px; 
+      font-weight: 600;
+      display: inline-flex; 
+      align-items: center; 
+      gap: 5px;
+      box-shadow: 0 3px 10px rgba(6, 199, 85, 0.3);
+      transition: all 0.2s var(--smooth); 
+      white-space: nowrap; 
+      flex-shrink: 0;
+    }
+    .btn-line:hover {
+      background: #05b34c; 
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(6, 199, 85, 0.4); 
+      color: #ffffff;
+    }
+    .btn-line:active { transform: scale(0.95); }
+
+    .grid { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+    .field { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+    .label { font-size: 12px; font-weight: 600; color: #64748b; margin-left: 4px; }
+
+    .note-box {
+      background: #fef2f2; 
+      border: 1.5px dashed #f87171; 
+      border-radius: 16px;
+      padding: 12px 16px; 
+      color: #dc2626; 
+      font-size: 15px; 
+      font-weight: 700;
+      text-align: center; 
+      margin-bottom: 4px; 
+      word-break: break-word;
+    }
+
+    .input-box {
+      display: grid; 
+      grid-template-columns: minmax(0, 1fr) auto; 
+      gap: 8px; 
+      align-items: center;
+      background: #f8fafc; 
+      border-radius: 16px; 
+      border: 1px solid var(--border-subtle);
+      padding: 4px 6px 4px 4px; 
+      width: 100%; 
+      max-width: 100%; 
+      transition: all 0.2s;
+    }
+    .input-box:hover { 
+      background: #ffffff; 
+      border-color: #cbd5e1;
+    }
+    .value { 
+      padding: 8px 6px 8px 12px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      color: var(--dark); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      display: block; 
+    }
+
+    .val-disabled { font-style: italic !important; color: var(--grey-disabled) !important; }
+
+    .btn {
+      background: var(--primary); 
+      color: #ffffff; 
+      border: none; 
+      padding: 9px 18px; 
+      border-radius: 12px; 
+      font-size: 13px; 
+      font-weight: 600; 
+      cursor: pointer;
+      min-width: 82px; 
+      text-align: center; 
+      transition: all 0.2s var(--smooth); 
+      flex-shrink: 0;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(215, 25, 32, 0.25);
+    }
+    .btn:active:not(:disabled) { transform: scale(0.94); }
+    .btn:disabled { 
+      background: #e2e8f0; 
+      color: var(--grey-disabled); 
+      cursor: not-allowed; 
+      min-width: 95px; 
+    }
+    .btn.copied { 
+      background: var(--green-success) !important; 
+      color: #ffffff;
+      transform: scale(1.03); 
+    }
+
+    .floating-dock {
+      position: fixed; 
+      bottom: 24px; 
+      left: 50%; 
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.8); 
+      border-radius: 100px;
+      display: flex; 
+      gap: 12px; 
+      padding: 8px 16px;
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
+      z-index: 900; 
+      opacity: 0; 
+      pointer-events: none; 
+      transition: all 0.4s var(--spring);
+    }
+    .floating-dock.show { 
+      transform: translateX(-50%) translateY(0); 
+      opacity: 1; 
+      pointer-events: auto; 
+    }
+
+    .dock-btn {
+      width: 44px; 
+      height: 44px; 
+      border-radius: 50%; 
+      border: none;
+      background: #f1f5f9; 
+      color: #0f172a; 
+      font-size: 18px;
+      cursor: pointer; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      transition: all 0.2s var(--spring); 
+    }
+    .dock-btn:hover { 
+      background: #e2e8f0; 
+      transform: translateY(-2px); 
+    }
+    .dock-btn:active { transform: scale(0.9); }
+    
+    .dock-btn.primary {
+      background: linear-gradient(135deg, #d71920 0%, #b71218 100%); 
+      color: #ffffff; 
+      font-size: 18px;
+      box-shadow: 0 6px 16px rgba(215, 25, 32, 0.35);
+    }
+
+    .modal-overlay {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6); 
+      backdrop-filter: blur(6px);
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000;
+      opacity: 0; 
+      pointer-events: none; 
+      transition: opacity 0.3s var(--smooth); 
+      padding: 16px;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: #ffffff; 
+      border-radius: 28px; 
+      width: 100%; 
+      max-width: 550px;
+      max-height: 90vh; 
+      overflow-y: auto; 
+      padding: 24px; 
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      transform: scale(0.95) translateY(20px); 
+      transition: all 0.3s var(--spring);
+    }
+    .modal-overlay.open .modal-card { transform: scale(1) translateY(0); }
+
+    .modal-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 20px; 
+      padding-bottom: 12px; 
+      border-bottom: 1px solid #f1f5f9; 
+    }
+    .modal-title { 
+      font-size: 19px; 
+      font-weight: 700; 
+      color: var(--dark); 
+    }
+    .btn-close { 
+      background: #f1f5f9; 
+      border: none; 
+      font-size: 16px; 
+      width: 34px; 
+      height: 34px; 
+      border-radius: 50%; 
+      cursor: pointer; 
+      color: #64748b; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: background 0.2s;
+    }
+    .btn-close:hover { background: #e2e8f0; color: var(--dark); }
+
+    .form-grid { display: flex; flex-direction: column; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #475569; }
+    .req { color: var(--red-required); font-weight: bold; margin-left: 2px; }
+
+    .form-control { 
+      width: 100%; 
+      padding: 12px 16px; 
+      font-size: 14px; 
+      border: 1.5px solid #cbd5e1; 
+      border-radius: 14px; 
+      outline: none; 
+      transition: border-color 0.2s; 
+      font-weight: 500; 
+    }
+    .form-control:focus { 
+      border-color: var(--primary); 
+      box-shadow: 0 0 0 3px rgba(215, 25, 32, 0.15); 
+    }
+    .form-control:disabled { 
+      background: #f8fafc; 
+      color: var(--grey-disabled); 
+      cursor: not-allowed; 
+      border-color: #e2e8f0; 
+    }
+
+    .dealer-builder { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      background: #f8fafc; 
+      padding: 12px; 
+      border-radius: 16px; 
+      border: 1px solid #e2e8f0; 
+    }
+    .dealer-row { display: flex; gap: 8px; align-items: center; }
+    .prefix-select { width: 110px; flex-shrink: 0; }
+
+    .checkbox-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      font-size: 13px; 
+      color: #64748b; 
+      font-weight: 500; 
+      margin-top: 2px; 
+      cursor: pointer; 
+      user-select: none; 
+    }
+    .checkbox-group input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    .btn-save { 
+      background: var(--primary); 
+      color: white; 
+      border: none; 
+      padding: 12px 24px; 
+      border-radius: 14px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      width: 100%; 
+      transition: all 0.2s;
+    }
+    .btn-save:hover { background: var(--primary-hover); }
+    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .empty-state { 
+      text-align: center; 
+      padding: 60px 20px; 
+      background: #ffffff; 
+      border-radius: 24px; 
+      font-size: 16px; 
+      font-weight: 600; 
+      color: #64748b; 
+      border: 1px solid var(--border-subtle);
+    }
+    .emoji-big { font-size: 44px; margin-bottom: 12px; display: block; }
+    
+    .loader { display: flex; justify-content: center; gap: 8px; margin: 40px 0; }
+    .dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; animation: bounce 0.5s var(--spring) infinite alternate; }
+    .dot:nth-child(2) { animation-delay: 0.15s; background: #b71218; }
+    .dot:nth-child(3) { animation-delay: 0.3s; background: #f87171; }
+
+    .toast { 
+      position: fixed; 
+      bottom: 32px; 
+      left: 50%; 
+      transform: translateX(-50%) translateY(100px) scale(0.9); 
+      background: var(--dark); 
+      color: white; 
+      padding: 12px 24px; 
+      border-radius: 100px; 
+      font-weight: 600; 
+      font-size: 14px; 
+      opacity: 0; 
+      transition: all 0.4s var(--spring); 
+      z-index: 2100; 
+      pointer-events: none; 
+      white-space: nowrap; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+
+    @keyframes popIn { 0% { opacity: 0; transform: translateY(20px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
+  </style>
 </head>
 <body>
 
-    <div id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">กำลังโหลด Dealer Hub...</div>
+  <!-- PIN Login Gate -->
+  <div id="authOverlay" class="auth-overlay hidden">
+    <div class="auth-card">
+      <div class="brand-pill-wrapper">
+        <span class="badge-jaymart">Jaymart</span>
+        <span class="badge-network">NETWORK</span>
+      </div>
+      <h2 class="auth-title">🔐 Dealer Hub</h2>
+      <p class="auth-sub">กรุณากรอกรหัส PIN เพื่อเข้าใช้งาน</p>
+      <form id="loginForm" autocomplete="off" onsubmit="handleLoginSubmit(event)">
+        <input
+          type="password"
+          id="pinInput"
+          class="pin-input"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="••••"
+          autocomplete="new-password"
+          name="dealer_hub_pin_field"
+          required
+        >
+        <div id="authError" class="auth-error"></div>
+        <button type="submit" id="btnLogin" class="btn-login">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <header class="header">
+      <div id="refreshAlert" class="refresh-indicator">🔄 กำลังอัปเดตข้อมูล...</div>
+      
+      <div class="brand-pill-wrapper">
+        <span class="badge-jaymart">Jaymart</span>
+        <span class="badge-network">NETWORK</span>
+      </div>
+
+      <h1 class="header-title">🚀 Dealer Hub</h1>
+      <p class="header-subtitle">ค้นหาและเพิ่มข้อมูลรวดเร็วทันใจ</p>
+    </header>
+    
+    <!-- Action Bar: Links to spreadsheets -->
+    <div class="action-bar">
+      <div class="links-wrapper">
+        <a href="https://docs.google.com/spreadsheets/d/1LZ2tHM99V9SdKfm5WJvDXJWx0EygmPyZXsYLqJgW-58/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-sheet">
+          📊 Cust. Dealer
+        </a>
+        <a href="https://docs.google.com/spreadsheets/d/1SCpYKkJf1lT-ST6mk6RHOlja-FsyGXlmkneYaEwgEig/edit?usp=drivesdk" target="_blank" rel="noopener noreferrer" class="btn-sheet">
+          🧾 Receipt (ฟอร์มวางเครดิต)
+        </a>
+        <a href="https://docs.google.com/spreadsheets/d/1HjTwOPwt1d-Tf6OKzxe4AcEGG7JDU3BMUjcULGY7qz8/edit?usp=drivesdk" target="_blank" rel="noopener noreferrer" class="btn-sheet">
+          🏷️ Label Dealer (ที่อยู่จัดส่ง)
+        </a>
+        <a href="https://docs.google.com/spreadsheets/d/1rBMh22mXLLB7GdFkf2Scs5a56CVCO6TetRNVqBYsiKI/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-sheet">
+          📝 ขอเปิด Code SG Finance
+        </a>
+      </div>
     </div>
 
-    <iframe 
-        id="appFrame" 
-        src="https://script.google.com/macros/s/AKfycbz9cev7lIxSAIPJyVZUTmHLkr5NC9gGdlUJjhv9TMa-Yj2qMar1SyuKLHWg84sFBUZh/exec?v=1" 
-        allow="fullscreen; camera; microphone; geolocation" 
-        onload="hideLoading()">
-    </iframe>
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ชื่อร้าน, รหัส, อีเมล..." autocomplete="off">
+      <button id="btnClearSearch" class="btn-clear-search" onclick="clearSearch()" title="ล้างคำค้นหา">✕</button>
+      <div id="suggestions" class="suggestions"></div>
+    </div>
 
-    <script>
-        function hideLoading() {
-            const loading = document.getElementById('loading');
-            loading.classList.add('fade-out');
+    <div class="toolbar-row">
+      <div class="toolbar-left">
+        <button id="btnManualRefresh" class="btn-refresh" onclick="manualRefresh()" title="รีเฟรชข้อมูลล่าสุด">🔄 รีเฟรช</button>
+        <span id="resultCount" class="result-count"></span>
+      </div>
+      <button class="btn-add-new" onclick="openModal()">➕ New Dealer</button>
+    </div>
+
+    <div id="loading" class="loader" style="display:none;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div id="results" class="results"></div>
+    <div id="loadMoreWrap" class="load-more-wrap" style="display:none;">
+      <button id="btnLoadMore" class="btn-load-more" onclick="loadMoreCards()">แสดงเพิ่มเติม</button>
+    </div>
+  </div>
+
+  <div id="floatingDock" class="floating-dock">
+    <button class="dock-btn" onclick="scrollToSearch()" title="ค้นหา">🔍</button>
+    <button class="dock-btn primary" onclick="openModal()" title="เพิ่ม Dealer ใหม่">➕</button>
+    <button class="dock-btn" onclick="scrollToTop()" title="ขึ้นบนสุด">🚀</button>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">✨ เพิ่มข้อมูล Dealer ใหม่</div>
+        <button class="btn-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <form id="dealerForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-grid">
+          
+          <div class="form-group">
+            <label class="form-label">1. Cust. Code <span class="req">*</span></label>
+            <input type="text" id="addCustCode" class="form-control" placeholder="ระบุ Cust. Code" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">2. Code 0 (วางเครดิต) <span class="req">*</span></label>
+            <input type="text" id="addCode0" class="form-control" placeholder="ระบุ Code 0" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkCode0" onchange="toggleNoData('addCode0', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">3. Dealer / ชื่อ / ร้านค้า <span class="req">*</span></label>
+            <div class="dealer-builder">
+              <div class="dealer-row">
+                <span style="font-weight:700; color:var(--primary); font-size:14px;">Dealer</span>
+                <select id="addPrefix" class="form-control prefix-select" onchange="handlePrefixChange(this.value)">
+                  <option value="คุณ">คุณ</option>
+                  <option value="หจก.">หจก.</option>
+                  <option value="บจก.">บจก.</option>
+                </select>
+                <input type="text" id="addDealerName" class="form-control" placeholder="พิมพ์ชื่อบุคคล/บริษัท" required>
+              </div>
+              <div id="shopNameBox" class="dealer-row">
+                <span style="font-size:13px; color:#64748b;">(</span>
+                <input type="text" id="addShopName" class="form-control" placeholder="พิมพ์ชื่อร้าน">
+                <span style="font-size:13px; color:#64748b;">)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">4. USER SG (Ref.2) <span class="req">*</span></label>
+            <input type="text" id="addUserSg" class="form-control" placeholder="ระบุ USER SG" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkUserSg" onchange="toggleNoData('addUserSg', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">5. Code ขายส่ง <span class="req">*</span></label>
+            <input type="text" id="addCodeWholesale" class="form-control" placeholder="ระบุ Code ขายส่ง" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkCodeWholesale" onchange="toggleNoData('addCodeWholesale', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">6. JWallet <span class="req">*</span></label>
+            <input type="text" id="addJWallet" class="form-control" placeholder="ระบุ JWallet" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkJWallet" onchange="toggleNoData('addJWallet', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">7. เบอร์โทร <span class="req">*</span></label>
+            <input type="text" id="addPhone" class="form-control" placeholder="ระบุเบอร์โทร" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">8. อีเมล <span class="req">*</span></label>
+            <input type="text" id="addEmail" class="form-control" placeholder="ระบุอีเมล" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkEmail" onchange="toggleNoData('addEmail', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">9. ลิงก์ LINE (Col J) <span class="req">*</span></label>
+            <input type="text" id="addLineUrl" class="form-control" placeholder="ระบุลิงก์ LINE หรือ @line" required>
+            <label class="checkbox-group">
+              <input type="checkbox" id="chkLineUrl" onchange="toggleNoData('addLineUrl', this)"> ไม่มีข้อมูล
+            </label>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="btnSubmitForm" class="btn-save">💾 บันทึกข้อมูล Dealer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"><span>✨</span> คัดลอกสำเร็จ!</div>
+
+  <script>
+    // =========================================================
+    // ตั้งค่า GAS Web App API URL
+    // =========================================================
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz9cev7lIxSAIPJyVZUTmHLkr5NC9gGdlUJjhv9TMa-Yj2qMar1SyuKLHWg84sFBUZh/exec';
+    const STORAGE_TOKEN_KEY = 'jaymart_dealer_session_token';
+    const STORAGE_EXPIRY_KEY = 'jaymart_dealer_session_expiry';
+    const SESSION_DURATION_MS = 6 * 60 * 60 * 1000; // 6 ชั่วโมง
+    const POLLING_INTERVAL = 30000;
+    const INITIAL_PAGE_SIZE = 30;
+    const MAX_SUGGESTIONS = 15;
+
+    let rawData = [];
+    let lastDataHash = '';
+    let currentLimit = INITIAL_PAGE_SIZE;
+    let pollingTimer = null;
+    let isFetching = false;
+
+    // เก็บค่าดิบสำหรับปุ่มคัดลอกและคำแนะนำเพื่อหลีกเลี่ยงปัญหา escape อักขระพิเศษใน onclick
+    let copyValueStore = [];
+    let currentSuggestions = [];
+
+    window.onload = function() {
+      initSession();
+    };
+
+    window.addEventListener('scroll', () => {
+      const dock = document.getElementById('floatingDock');
+      if (window.scrollY > 220) {
+        dock.classList.add('show');
+      } else {
+        dock.classList.remove('show');
+      }
+    });
+
+    function getStoredToken() {
+      const token = localStorage.getItem(STORAGE_TOKEN_KEY);
+      const expiry = Number(localStorage.getItem(STORAGE_EXPIRY_KEY) || '0');
+      if (!token || !expiry || Date.now() >= expiry) {
+        clearStoredSession();
+        return null;
+      }
+      return token;
+    }
+
+    function saveSession(token, expiresInSeconds) {
+      const ttlMs = expiresInSeconds ? expiresInSeconds * 1000 : SESSION_DURATION_MS;
+      localStorage.setItem(STORAGE_TOKEN_KEY, token);
+      localStorage.setItem(STORAGE_EXPIRY_KEY, String(Date.now() + ttlMs));
+    }
+
+    function clearStoredSession() {
+      localStorage.removeItem(STORAGE_TOKEN_KEY);
+      localStorage.removeItem(STORAGE_EXPIRY_KEY);
+    }
+
+    function showAuthOverlay(errorMsg = '') {
+      stopPolling();
+      const overlay = document.getElementById('authOverlay');
+      const pinInput = document.getElementById('pinInput');
+      const authError = document.getElementById('authError');
+      overlay.classList.remove('hidden');
+      authError.textContent = errorMsg;
+      pinInput.value = '';
+      setTimeout(() => pinInput.focus(), 50);
+    }
+
+    function hideAuthOverlay() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('authError').textContent = '';
+    }
+
+    function initSession() {
+      const token = getStoredToken();
+      if (!token) {
+        showAuthOverlay();
+        return;
+      }
+      hideAuthOverlay();
+      fetchData(true);
+      startPolling();
+    }
+
+    function startPolling() {
+      stopPolling();
+      pollingTimer = setInterval(() => fetchData(false, false), POLLING_INTERVAL);
+    }
+
+    function stopPolling() {
+      if (pollingTimer) {
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+      }
+    }
+
+    async function callGasApi(payload) {
+      const response = await fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+      }
+      return await response.json();
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const pinInput = document.getElementById('pinInput');
+      const btnLogin = document.getElementById('btnLogin');
+      const authError = document.getElementById('authError');
+      const pin = pinInput.value.trim();
+
+      if (!pin) return;
+
+      btnLogin.disabled = true;
+      btnLogin.textContent = '⏳ กำลังตรวจสอบ...';
+      authError.textContent = '';
+
+      try {
+        const res = await callGasApi({ action: 'login', pin: pin });
+        if (res.success && res.token) {
+          saveSession(res.token, res.expiresInSeconds);
+          hideAuthOverlay();
+          if (Array.isArray(res.data)) {
+            rawData = res.data;
+            lastDataHash = res.dataHash || '';
+            currentLimit = INITIAL_PAGE_SIZE;
+            document.getElementById('loading').style.display = 'none';
+            applyFilterAndRender(true);
+          } else {
+            fetchData(true);
+          }
+          startPolling();
+        } else {
+          authError.textContent = res.message || 'รหัส PIN ไม่ถูกต้อง';
+          pinInput.value = '';
+          pinInput.focus();
         }
-    </script>
+      } catch (err) {
+        authError.textContent = 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาลองใหม่';
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'เข้าสู่ระบบ';
+      }
+    }
 
+    function scrollToSearch() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => document.getElementById('searchInput').focus(), 400); 
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function manualRefresh() {
+      fetchData(false, true);
+    }
+
+    async function fetchData(isInitialLoad, isManualRefresh = false) {
+      if (isFetching) return;
+      const token = getStoredToken();
+      if (!token) {
+        showAuthOverlay();
+        return;
+      }
+
+      isFetching = true;
+      const loader = document.getElementById('loading');
+      const refreshAlert = document.getElementById('refreshAlert');
+
+      if (isInitialLoad) {
+        loader.style.display = 'flex';
+      } else if (isManualRefresh) {
+        refreshAlert.classList.add('updating');
+      }
+
+      try {
+        const res = await callGasApi({ action: 'getData', token: token });
+
+        if (!res.success) {
+          if (res.error === 'UNAUTHORIZED') {
+            clearStoredSession();
+            showAuthOverlay('เซสชันหมดอายุ กรุณากรอก PIN ใหม่อีกครั้ง');
+            return;
+          }
+          if (isInitialLoad) {
+            loader.innerHTML = '<span style="color:var(--red-required); font-weight:bold;">❌ โหลดข้อมูลไม่สำเร็จ</span>';
+          } else if (isManualRefresh) {
+            showToast('❌ ' + (res.message || 'อัปเดตข้อมูลไม่สำเร็จ'));
+          }
+          return;
+        }
+
+        const incomingHash = res.dataHash || '';
+        const hasChanged = !lastDataHash || incomingHash !== lastDataHash;
+
+        if (isInitialLoad) {
+          loader.style.display = 'none';
+          rawData = res.data || [];
+          lastDataHash = incomingHash;
+          applyFilterAndRender(true);
+        } else if (hasChanged) {
+          rawData = res.data || [];
+          lastDataHash = incomingHash;
+          applyFilterAndRender(false);
+          if (isManualRefresh) showToast('อัปเดตข้อมูลล่าสุดแล้ว ✨');
+        } else {
+          // ข้อมูลเหมือนเดิม: ไม่ Re-render หน้าจอเลย เพื่อกันหน้ากระพริบและอาการเด้งหลุดเวลาคัดลอก
+          if (isManualRefresh) showToast('ข้อมูลเป็นปัจจุบันแล้ว 👍');
+        }
+      } catch (err) {
+        if (isInitialLoad) {
+          loader.style.display = 'flex';
+          loader.innerHTML = '<span style="color:var(--red-required); font-weight:bold;">❌ เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ</span>';
+        } else if (isManualRefresh) {
+          showToast('❌ เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ');
+        }
+      } finally {
+        refreshAlert.classList.remove('updating');
+        isFetching = false;
+      }
+    }
+
+    const isFalsy = (val, allowNone = false) => {
+      if (val === null || val === undefined) return true;
+      const v = String(val).trim().toUpperCase();
+      if (allowNone && v === 'NONE') return false; 
+      return ['','-','NONE','0','ไม่มีข้อมูล','ไม่ส่งข้อมูล','#N/A'].includes(v);
+    };
+
+    const searchInput = document.getElementById('searchInput');
+    const suggestions = document.getElementById('suggestions');
+    const btnClearSearch = document.getElementById('btnClearSearch');
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      
+      if (q.length > 0) {
+        btnClearSearch.classList.add('show');
+      } else {
+        btnClearSearch.classList.remove('show');
+      }
+
+      if (!q) {
+        suggestions.style.display = 'none';
+        currentLimit = INITIAL_PAGE_SIZE;
+        applyFilterAndRender(true);
+        return;
+      }
+
+      const filtered = filterData(q);
+      showSuggests(filtered);
+      renderCards(filtered, true, false);
+    });
+
+    function filterData(q) {
+      return rawData.filter(item =>
+        Object.values(item).some(val => String(val || '').toLowerCase().includes(q))
+      );
+    }
+
+    function applyFilterAndRender(animate = true) {
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) {
+        const filtered = filterData(q);
+        renderCards(filtered, animate, false);
+      } else {
+        renderCards(rawData, animate, true);
+      }
+    }
+
+    function clearSearch() {
+      searchInput.value = '';
+      btnClearSearch.classList.remove('show');
+      suggestions.style.display = 'none';
+      currentLimit = INITIAL_PAGE_SIZE;
+      applyFilterAndRender(true);
+      searchInput.focus(); 
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-wrapper')) suggestions.style.display = 'none';
+    });
+
+    // Event delegation สำหรับรายการแนะนำ
+    suggestions.addEventListener('click', (e) => {
+      const itemEl = e.target.closest('.suggest-item');
+      if (!itemEl) return;
+      const idx = Number(itemEl.dataset.suggestIdx);
+      const selected = currentSuggestions[idx];
+      if (!selected) return;
+      selectItem(selected.dealerName || '');
+    });
+
+    // Event delegation สำหรับปุ่มคัดลอก
+    document.getElementById('results').addEventListener('click', (e) => {
+      const btn = e.target.closest('button.btn[data-copy-idx]');
+      if (!btn || btn.disabled) return;
+      const idx = Number(btn.dataset.copyIdx);
+      const rawVal = copyValueStore[idx];
+      if (rawVal !== undefined) {
+        doCopy(rawVal, btn);
+      }
+    });
+
+    function showSuggests(list) {
+      if (list.length === 0) {
+        currentSuggestions = [];
+        suggestions.style.display = 'none';
+        return;
+      }
+      currentSuggestions = list.slice(0, MAX_SUGGESTIONS);
+      suggestions.innerHTML = currentSuggestions.map((item, idx) => `
+        <div class="suggest-item" data-suggest-idx="${idx}">
+          <div class="suggest-title">🏪 ${escapeHtml(item.dealerName || 'ไม่ระบุชื่อ')}</div>
+          <div class="suggest-sub">Cust: ${escapeHtml(item.custCode || '-')} • Code0: ${escapeHtml(item.code0 || '-')}</div>
+        </div>
+      `).join('');
+      suggestions.style.display = 'block';
+    }
+
+    function selectItem(name) {
+      searchInput.value = name; 
+      suggestions.style.display = 'none';
+      btnClearSearch.classList.add('show'); 
+      const matched = rawData.filter(i => i.dealerName === name);
+      renderCards(matched, true, false);
+    }
+
+    function loadMoreCards() {
+      currentLimit += INITIAL_PAGE_SIZE;
+      applyFilterAndRender(false);
+    }
+
+    function renderCards(list, shouldAnimate = true, usePagination = true) {
+      const box = document.getElementById('results');
+      const loadMoreWrap = document.getElementById('loadMoreWrap');
+      const btnLoadMore = document.getElementById('btnLoadMore');
+      const resultCount = document.getElementById('resultCount');
+
+      copyValueStore = [];
+
+      if (list.length === 0) {
+        resultCount.textContent = 'พบ 0 ร้าน';
+        loadMoreWrap.style.display = 'none';
+        box.innerHTML = `<div class="empty-state"><span class="emoji-big">🕵️♂️</span>⚠ ไม่พบร้านค้าที่คุณตามหา</div>`;
+        return;
+      }
+
+      const displayList = usePagination ? list.slice(0, currentLimit) : list;
+      const remaining = list.length - displayList.length;
+
+      if (usePagination) {
+        resultCount.textContent = `แสดง ${displayList.length} จาก ${list.length} ร้าน`;
+      } else {
+        resultCount.textContent = `พบ ${list.length} ร้าน`;
+      }
+
+      if (remaining > 0) {
+        loadMoreWrap.style.display = 'flex';
+        btnLoadMore.textContent = `แสดงเพิ่มเติม (อีก ${remaining} ร้าน)`;
+      } else {
+        loadMoreWrap.style.display = 'none';
+      }
+
+      const animateCards = shouldAnimate && displayList.length <= 20;
+
+      box.innerHTML = displayList.map((item, index) => {
+        const hasCode0 = !isFalsy(item.code0, false);
+        const animStyle = animateCards ? `animation-delay: ${index * 0.05}s;` : `opacity: 1; transform: none; animation: none;`;
+        const isJmt = item.source === 'JMT';
+        
+        let noteHtml = '';
+        if (isJmt && item.note) {
+          noteHtml = `
+            <div class="field" style="margin-bottom: 4px;">
+              <div class="note-box">
+                🚨 หมายเหตุ: ${escapeHtml(item.note)}
+              </div>
+            </div>
+          `;
+        }
+
+        const hasLine = !isFalsy(item.lineUrl, false);
+        let lineBtnHtml = '';
+        if (hasLine) {
+          const lineStr = String(item.lineUrl).trim();
+          const lineHref = (lineStr.startsWith('http://') || lineStr.startsWith('https://') || lineStr.startsWith('line://'))
+            ? lineStr 
+            : ('https://' + lineStr);
+          lineBtnHtml = `
+            <a href="${escapeHtml(lineHref)}" target="_blank" rel="noopener noreferrer" class="btn-line" title="เปิด LINE">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.035 9.608.391.084.922.258 1.057.592.122.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.573-3.872 2.573-5.992z"/>
+              </svg>
+              LINE
+            </a>
+          `;
+        }
+
+        return `
+          <div class="card" style="${animStyle}">
+            <div class="card-header">
+              <div class="shop-name">🛍️ ${escapeHtml(item.dealerName || 'ไม่ระบุชื่อร้าน')}</div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                ${isJmt ? '<div class="badge badge-jmt">📌 JMT/Singer</div>' : ''}
+                ${hasCode0 ? '<div class="badge">🔥 มีเครดิต (Code 0)</div>' : ''}
+                ${lineBtnHtml}
+              </div>
+            </div>
+            
+            <div class="grid">
+              ${noteHtml}
+              ${createBox('Cust. Code', item.custCode, hasCode0, false)}
+              ${createBox('Code 0 (วางเครดิต)', item.code0, false, false)}
+              ${createBox('Dealer/ชื่อ/ร้านค้า', item.dealerName, false, false)}
+              ${createBox('USER SG (Ref.2)', item.userSg, false, false)}
+              ${createBox('Code ขายส่ง', item.codeWholesale, false, false)}
+              ${createBox('JWallet', item.jWallet, false, false)}
+              ${createBox('เบอร์โทร', item.phone, false, false)}
+              ${createBox('อีเมล', item.email, false, true)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createBox(label, value, isCustFieldAndHasCode0, isEmailField) {
+      if (isFalsy(value, isEmailField)) return ''; 
+      const disp = escapeHtml(value);
+      const tClass = isCustFieldAndHasCode0 ? 'val-disabled' : '';
+      const btnLabel = isCustFieldAndHasCode0 ? 'ห้ามคัดลอก' : 'คัดลอก';
+      const isDisable = isCustFieldAndHasCode0;
+      const copyIdx = copyValueStore.push(String(value)) - 1;
+
+      return `
+        <div class="field">
+          <span class="label">${label}</span>
+          <div class="input-box">
+            <span class="value ${tClass}" title="${disp}">${disp}</span>
+            <button type="button" class="btn" ${isDisable ? 'disabled' : ''} data-copy-idx="${copyIdx}">${btnLabel}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('dealerForm').reset();
+      handlePrefixChange('คุณ');
+      
+      const inputsToReset = ['addCode0', 'addUserSg', 'addCodeWholesale', 'addJWallet', 'addEmail', 'addLineUrl'];
+      inputsToReset.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.disabled = false;
+          input.required = true;
+        }
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handlePrefixChange(prefix) {
+      const shopNameBox = document.getElementById('shopNameBox');
+      if (prefix === 'คุณ') {
+        shopNameBox.style.display = 'flex';
+      } else {
+        shopNameBox.style.display = 'none';
+        document.getElementById('addShopName').value = '';
+      }
+    }
+
+    function toggleNoData(inputId, chkElement) {
+      const input = document.getElementById(inputId);
+      if (chkElement.checked) {
+        input.value = '';
+        input.disabled = true;
+        input.required = false;
+      } else {
+        input.disabled = false;
+        input.required = true;
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const token = getStoredToken();
+      if (!token) {
+        closeModal();
+        showAuthOverlay('เซสชันหมดอายุ กรุณากรอก PIN ใหม่อีกครั้ง');
+        return;
+      }
+
+      const btnSubmit = document.getElementById('btnSubmitForm');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = '⏳ กำลังบันทึกข้อมูล...';
+
+      const custCodeVal = document.getElementById('addCustCode').value.trim();
+      const prefixVal = document.getElementById('addPrefix').value;
+      const nameVal = document.getElementById('addDealerName').value.trim();
+      const shopNameVal = document.getElementById('addShopName').value.trim();
+
+      let formattedName = 'Dealer ' + prefixVal + ' ' + nameVal;
+      if (prefixVal === 'คุณ' && shopNameVal !== '') {
+        formattedName += ' (' + shopNameVal + ')';
+      }
+
+      const isDuplicate = rawData.some(item => {
+        const matchCust = item.custCode && item.custCode.toString().trim().toLowerCase() === custCodeVal.toLowerCase();
+        const matchName = item.dealerName && item.dealerName.toString().trim().toLowerCase() === formattedName.toLowerCase();
+        return matchCust || matchName;
+      });
+
+      if (isDuplicate) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = '💾 บันทึกข้อมูล Dealer';
+        showToast('⚠️ ร้านค้านี้หรือ Cust. Code นี้มีอยู่ในระบบแล้ว!');
+        return;
+      }
+
+      const payload = {
+        custCode: custCodeVal,
+        code0: document.getElementById('chkCode0').checked ? '' : document.getElementById('addCode0').value,
+        prefix: prefixVal,
+        name: nameVal,
+        shopName: shopNameVal,
+        userSg: document.getElementById('chkUserSg').checked ? '' : document.getElementById('addUserSg').value,
+        codeWholesale: document.getElementById('chkCodeWholesale').checked ? '' : document.getElementById('addCodeWholesale').value,
+        jWallet: document.getElementById('chkJWallet').checked ? '' : document.getElementById('addJWallet').value,
+        phone: document.getElementById('addPhone').value,
+        email: document.getElementById('chkEmail').checked ? '' : document.getElementById('addEmail').value,
+        lineUrl: document.getElementById('chkLineUrl').checked ? '' : document.getElementById('addLineUrl').value
+      };
+
+      try {
+        const res = await callGasApi({
+          action: 'addDealer',
+          token: token,
+          payload: payload
+        });
+
+        if (res.success) {
+          showToast('บันทึกข้อมูลสำเร็จแล้ว! ✨');
+          closeModal();
+          if (Array.isArray(res.data)) {
+            rawData = res.data;
+            lastDataHash = res.dataHash || '';
+            applyFilterAndRender(true);
+          } else {
+            fetchData(false, false);
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (res.error === 'UNAUTHORIZED') {
+          closeModal();
+          clearStoredSession();
+          showAuthOverlay('เซสชันหมดอายุ กรุณากรอก PIN ใหม่อีกครั้ง');
+        } else {
+          showToast('❌ ' + (res.message || 'ไม่สามารถบันทึกข้อมูลได้'));
+        }
+      } catch (err) {
+        showToast('❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = '💾 บันทึกข้อมูล Dealer';
+      }
+    }
+
+    function doCopy(txt, btn) {
+      if (!txt) return;
+      const finishCopy = () => {
+        const oldTxt = btn.innerText;
+        btn.innerText = '✨ สำเร็จ';
+        btn.classList.add('copied');
+        if (navigator.vibrate) navigator.vibrate(50);
+        showToast('คัดลอกสำเร็จ!');
+        setTimeout(() => {
+          btn.innerText = oldTxt;
+          btn.classList.remove('copied');
+        }, 1500);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(finishCopy).catch(() => fbCopy(txt, finishCopy));
+      } else {
+        fbCopy(txt, finishCopy);
+      }
+    }
+
+    function fbCopy(txt, cb) {
+      const el = document.createElement('textarea');
+      el.value = txt;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      try {
+        document.execCommand('copy');
+        cb();
+      } catch (e) {}
+      document.body.removeChild(el);
+    }
+
+    let toastTimer;
+    function showToast(msg = 'คัดลอกสำเร็จ!') {
+      const toast = document.getElementById('toast'); 
+      toast.innerHTML = `<span>✨</span> ${escapeHtml(msg)}`;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
 </body>
 </html>
